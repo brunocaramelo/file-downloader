@@ -8,22 +8,23 @@ topics:
     downloaded-file: message.file-downloader.downloaded-file
 
 hdfs:
-  uri: hdfs://localhost:9000
+  uri: ${HDFS_SERVER_HOST:"localhost:9002"}
   output:
     path: /hansard/raw/
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5434/file_downloader
-    username: postgres
-    password: password
+    driver-class-name: ${SPRING_DATASOURCE_DRIVER_CLASS_NAME:"org.postgresql.Driver"}
+    url: ${SPRING_DATASOURCE_URL:"jdbc:postgresql://localhost:5434/file_downloader"}
+    username: ${DATABASE_USER:"postgres"}
+    password: ${DATABASE_PASSWORD:"password"}
   flyway:
     enabled: false
   jpa:
     hibernate:
       ddl-auto: validate
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: ${KAFKA_SERVER_HOST:"localhost:9092"}
     consumer:
       group-id: file-downloader
       auto-offset-reset: earliest
@@ -41,4 +42,4 @@ spring:
     properties:
       schema:
         registry:
-          url: http://localhost:8081
+          url: ${HTTP_REGISTRY_SCHEMA_SERVER_HOST:"http://localhost:8081"}

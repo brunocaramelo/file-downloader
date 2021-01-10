@@ -56,10 +56,10 @@ dependencies {
     testImplementation 'com.bgasparotto:spring-kafka-avro-test:1.0.3'
 }
 
-test {
-    useJUnitPlatform()
-    finalizedBy jacocoTestReport
-}
+// test {
+//     useJUnitPlatform()
+//     finalizedBy jacocoTestReport
+// }
 
 jacocoTestReport {
     reports {

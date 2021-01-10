@@ -32,6 +32,7 @@ services:
 
   schema-registry:
     image: confluentinc/cp-schema-registry:5.3.1
+    container_name: schema-registry-file-downloader
     depends_on:
       - zookeeper
       - kafka
@@ -48,7 +49,7 @@ services:
       static-network:
         ipv4_address: 172.100.1.2
     ports:
-      - 9000:9000
+      - 9002:9000
       - 9870:9870
     volumes:
       - hadoop_namenode:/hadoop/dfs/name
@@ -71,7 +72,35 @@ services:
       SERVICE_PRECONDITION: "namenode:9870"
     env_file:
       - compose/hadoop/hadoop.env
-
+  spring-boot-jpa-docker-webapp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: docker-spring-kafka-file-downloader:1.0
+    container_name: docker-spring-kafka-file-downloader
+    volumes:
+      - ./server:/home/gradle/server
+    depends_on:
+      - postgres
+      - zookeeper
+      - kafka
+    links:
+      - postgres
+      - zookeeper
+      - kafka
+    ports:
+      - 8084:8080
+    environment:
+      - DATABASE_HOST=postgres
+      - DATABASE_USER=postgres
+      - DATABASE_PASSWORD=password
+      - DATABASE_NAME=file_downloader  
+      - KAFKA_SERVER_HOST=kafka:9092
+      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
+      - HTTP_REGISTRY_SCHEMA_SERVER_HOST=http://schmema-registry:8081
+      - HDFS_SERVER_HOST=namenode:9002
+      - JAVA_TOOL_OPTIONS=-XX:MinRAMPercentage=75 -XX:MaxRAMPercentage=75
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5434/file_downloader
 networks:
   static-network:
     ipam:

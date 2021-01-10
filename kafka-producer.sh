@@ -5,14 +5,14 @@ if [ -z "$topic" ]; then
   exit 1
 fi
 
-schema_registry_container=$(docker container ls -q --filter name='^/schema-registry$')
+schema_registry_container=$(docker container ls -q --filter name='schema-registry-file-downloader')
 if [ -z "$schema_registry_container" ]; then
   echo "Schema registry not running. Run 'docker-compose up -d' and try again"
   exit 1
 fi
 
 if [ "$(dpkg-query -W -f='${Status}' jq 2>/dev/null | grep -c "ok installed")" -eq 0 ]; then
-  apt-get install jq
+  apt-get install jq -y
 fi
 
 value_schema=$(curl http://localhost:8081/subjects/"$topic"-value/versions/latest | jq -r .schema)
